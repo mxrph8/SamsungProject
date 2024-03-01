@@ -2,10 +2,11 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/fragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".FragmentCategory"
-    android:background="@color/categorybg">
+    android:background="@color/secondpanelbg"
+    tools:context=".FragmentCategory">
 
     <CheckBox
         android:id="@+id/cbfm"
@@ -14,8 +15,8 @@
         android:fontFamily="@font/archivo_black"
 
 
-
         android:text="Физ-Мат"
+        android:textColor="@color/white"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -25,8 +26,9 @@
         android:layout_width="match_parent"
         android:layout_height="110dp"
         android:fontFamily="@font/archivo_black"
-        android:text="Соц-Эконом"
         android:progress="400"
+        android:text="Соц-Эконом"
+        android:textColor="@color/white"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/cbfm" />
@@ -37,6 +39,7 @@
         android:layout_height="110dp"
         android:fontFamily="@font/archivo_black"
         android:text="Хим-Био"
+        android:textColor="@color/white"
 
 
         app:layout_constraintEnd_toEndOf="parent"
@@ -50,6 +53,7 @@
         android:max="400"
         android:min="0"
         android:progress="400"
+        android:textColor="@color/white"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.163"
         app:layout_constraintStart_toStartOf="parent"
@@ -62,6 +66,7 @@
         android:layout_marginStart="4dp"
         android:layout_marginTop="24dp"
         android:text="Значние : "
+        android:textColor="@color/white"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/sb" />
 
@@ -72,6 +77,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="24dp"
         android:text="400"
+        android:textColor="@color/white"
         app:layout_constraintStart_toEndOf="@+id/textViewdont"
         app:layout_constraintTop_toBottomOf="@+id/sb" />
 
@@ -80,9 +86,68 @@
         android:layout_width="match_parent"
         android:layout_height="110dp"
         android:text="Мат-Инф"
+        android:textColor="@color/white"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/cbxb" />
+
+    <Button
+        android:id="@+id/closebt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="500dp"
+        android:layout_marginBottom="150dp"
+        android:text="Отсортировать"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/cbfm" />
+
+    <ListView
+        android:id="@+id/asdf"
+        android:layout_width="438dp"
+        android:layout_height="185dp"
+        android:layout_marginTop="1dp"
+        android:alpha="0"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/closebt" />
+
+    <ListView
+        android:id="@+id/asd"
+        android:layout_width="130dp"
+        android:layout_height="100dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="1dp"
+        android:alpha="0"
+        app:layout_constraintBottom_toTopOf="@+id/asdf"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/closebt"
+        app:layout_constraintTop_toBottomOf="@+id/sb" />
+
+    <ListView
+        android:id="@+id/asdfg"
+        android:layout_width="135dp"
+        android:layout_height="160dp"
+        android:layout_marginTop="70dp"
+        android:layout_marginBottom="1dp"
+        android:alpha="0"
+        app:layout_constraintBottom_toTopOf="@+id/asdf"
+        app:layout_constraintEnd_toStartOf="@+id/closebt"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/sb" />
+
+    <ListView
+        android:layout_width="170dp"
+        android:layout_height="60dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="1dp"
+        android:alpha="0"
+        app:layout_constraintBottom_toTopOf="@+id/closebt"
+        app:layout_constraintEnd_toStartOf="@+id/asd"
+        app:layout_constraintStart_toEndOf="@+id/asdfg"
+        app:layout_constraintTop_toBottomOf="@+id/sb" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,5 +1,8 @@
 package dik.mysamsungproject;
 
+import static android.view.View.INVISIBLE;
+import static android.view.View.VISIBLE;
+
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.View;
@@ -59,12 +62,8 @@ public class MainActivity extends AppCompatActivity {
         return cb_mi;
     }
 
-
-
-
     FragmentCategory fragmentCategory = new FragmentCategory();
 
-    int CLickSchet = 0;
     String SelectUniversity_fm;
     String SelectUniversity_xb;
     String SelectUniversity_se;
@@ -86,7 +85,6 @@ public class MainActivity extends AppCompatActivity {
         categorybt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                CLickSchet += 1;
                 setNewFragment(fragmentCategory);
             }
         });
@@ -110,20 +108,22 @@ public class MainActivity extends AppCompatActivity {
                 new Observer<Integer>() {
                     @Override
                     public void onChanged(Integer integer) {
-                        FilterByPoints();
+                        FilterByPointsAndFaculty();
+
                     }
                 }
-                );
+        );
         cb_mi.observe(this, new Observer<Boolean>() {
             @Override
             public void onChanged(Boolean aBoolean) {
                 if (getCb_mi().getValue() == true){
-                    sortByFaculty("Мат-Инф");
                     SelectUniversity_mi ="Мат-Инф";
+                    FilterByPointsAndFaculty();
                 }
                 else {
-                    unSortByFaculty("Мат-Инф");
-                    cleanArrayList();
+                    SelectUniversity_mi =null;
+                    FilterByPointsAndFaculty();
+
                 }
             }
         });
@@ -133,13 +133,14 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onChanged(Boolean aBoolean) {
                         if (getCb_fm().getValue() == true){
-                            sortByFaculty("Физ-Мат");
                             SelectUniversity_fm ="Физ-Мат";
+                            FilterByPointsAndFaculty();
                         }
                         else {
-                            unSortByFaculty("Физ-Мат");
-                            cleanArrayList();
-                            }
+                            SelectUniversity_fm =null;
+                            FilterByPointsAndFaculty();
+
+                        }
                     }
                 });
         cb_se.observe(this,
@@ -147,11 +148,15 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onChanged(Boolean aBoolean) {
                         if (getCb_se().getValue() == true){
-                            sortByFaculty("Соц-Эконом");
+
+
                             SelectUniversity_se ="Соц-Эконом";
+                            FilterByPointsAndFaculty();
                         }
-                        else {unSortByFaculty("Соц-Эконом");
-                            cleanArrayList();}
+                        else {
+                            SelectUniversity_se = null;
+                            FilterByPointsAndFaculty();
+                            }
                     }
                 });
         cb_xb.observe(this,
@@ -159,48 +164,57 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onChanged(Boolean aBoolean) {
                         if (getCb_xb().getValue() == true){
-                            sortByFaculty("Хим-Био");
                             SelectUniversity_xb ="Хим-Био";
+                            FilterByPointsAndFaculty();
                         }
-                        else {unSortByFaculty("Хим-Био");
-                            cleanArrayList();
-                            }
+                        else {
+                            SelectUniversity_xb = null;
+                            FilterByPointsAndFaculty();
+
+                        }
                     }
                 });
     }
-    public void cleanArrayList(){
-        if (sortedUniversities.isEmpty()) {
-            UniversityAdapter universitiesAdapter = new UniversityAdapter(this, universities);
-            binding.ListView.setAdapter(universitiesAdapter);
-        }
-    }
-    public void FilterByPoints(){
+    public void FilterByPointsAndFaculty() {
+        sortedUniversities.clear();
+        int seekBarValue = getSeekBarValue().getValue();
+        boolean anyFacultyChecked = SelectUniversity_fm != null && !SelectUniversity_fm.isEmpty() ||
+                SelectUniversity_se != null && !SelectUniversity_se.isEmpty() ||
+                SelectUniversity_xb != null && !SelectUniversity_xb.isEmpty() ||
+                SelectUniversity_mi != null && !SelectUniversity_mi.isEmpty();
+
         for (University university : universities) {
-            if (university.getPoints() > getSeekBarValue().getValue()) {
-            if ((SelectUniversity_fm ==  null ||SelectUniversity_se ==  null || SelectUniversity_xb ==  null ||SelectUniversity_mi ==  null) || (
-                    university.getFaculty().equals(SelectUniversity_fm) || university.getFaculty().equals(SelectUniversity_xb) || university.getFaculty().equals(SelectUniversity_se)||university.getFaculty().equals(SelectUniversity_mi) )
-                    ){
-                sortedUniversities.remove(university);
-            }
-                UniversityAdapter universitiesAdapter = new UniversityAdapter(this, sortedUniversities);
-                binding.ListView.setAdapter(universitiesAdapter);
+            if (university.getPoints() <= seekBarValue) {
+                if (!anyFacultyChecked ||
+                        (SelectUniversity_fm != null && !SelectUniversity_fm.isEmpty() && SelectUniversity_fm.equals(university.getFaculty())) ||
+                        (SelectUniversity_se != null && !SelectUniversity_se.isEmpty() && SelectUniversity_se.equals(university.getFaculty())) ||
+                        (SelectUniversity_xb != null && !SelectUniversity_xb.isEmpty() && SelectUniversity_xb.equals(university.getFaculty())) ||
+                        (SelectUniversity_mi != null && !SelectUniversity_mi.isEmpty() && SelectUniversity_mi.equals(university.getFaculty()))) {
+                    sortedUniversities.add(university);
+                }
             }
         }
+
+        if (!anyFacultyChecked) {
+            sortedUniversities.addAll(universities);
+            for (University university : universities) {
+                if (university.getPoints() > seekBarValue) {
+                    sortedUniversities.remove(university);
+                }
+            }
+
         }
+
+        UniversityAdapter universitiesAdapter = new UniversityAdapter(this, sortedUniversities);
+        binding.ListView.setAdapter(universitiesAdapter);
+    }
 
 
     private void setNewFragment(Fragment fragment) {
-        if (CLickSchet % 2 != 0) {
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.replace(R.id.frame_layout, fragment);
             ft.show(fragment);
             ft.commit();
-        } else {
-            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.hide(fragment);
-            ft.commit();
-        }
-
     }
 
 
@@ -232,7 +246,7 @@ public class MainActivity extends AppCompatActivity {
         universities.add(new University(24, "Российский университет кооперации", "Мат-Инф", 235, "Российский университет кооперации — главный учебный и научный центр системы кооперативного образования России, вуз со столетней историей и сложившимися классическими традициями образования. Учредитель Университета — Центросоюз Российской Федерации. В Университете эффективно действует система непрерывного образования, которая включает в себя довузовскую подготовку, начальное, среднее, высшее профессиональное образование, повышение квалификации и переподготовку специалистов, обучение в аспирантуре и докторантуре. Вуз выдает документы об образовании государственного образца."));
         universities.add(new University(25, "Московский технологический институт", "Мат-Инф", 250, "18 ноября 2021года Московский открытый институт официально сменил название на Московский технологический институт (МТИ). Вуз взял курс на современные технологии и активно пополняет свою линейку техническими направлениями."));
         universities.add(new University(26, "Национальный исследовательский университет ИТМО", "Мат-Инф", 250, "Университет ИТМО – ведущий вуз России в области информационных и фотонных технологий, один из немногих российских вузов, получивших в 2009 году статус национального исследовательского университета. В составе Университета ИТМО функционируют более 20 институтов и факультетов, где обучаются около 12 тысяч студентов и аспирантов, работают 1200 преподавателей и научных сотрудников (из них около 700 – доктора и кандидаты наук)."));
-        universities.add(new University(27, "Университет ИТМО ", "Физ-Мат", 111, "dadadaff"));
+        universities.add(new University(27, "Университет ИТМО ", "Физ-Мат", 111, "Университет ИТМО (в советское время — ЛИТМО, Ленинградский институт точной механики и оптики) — российское федеральное государственное автономное учебное заведение высшего и послевузовского образования, с 2009 года — национальный исследовательский университет (НИУ)[2]. Основан в 1900 году в Санкт-Петербурге. Приоритетные направления вуза — информационные технологии, искусственный интеллект, фотоника, робототехника, квантовые коммуникации, трансляционная медицина, науки о жизни (Life Sciences), Art&Science, научная коммуникация. Команда ИТМО по спортивному программированию — единственный в мире семикратный чемпион крупнейшей международной студенческой олимпиады ICPC[3][4]."));
         universities.add(new University(28, "Уральский институт Государственной противопожарной службы МЧС России", "Физ-Мат", 240, "Университет ИТМО – ведущий вуз России в области информационных и фотонных технологий, один из немногих российских вузов, получивших в 2009 году статус национального исследовательского университета. В составе Университета ИТМО функционируют более 20 институтов и факультетов, где обучаются около 12 тысяч студентов и аспирантов, работают 1200 преподавателей и научных сотрудников (из них около 700 – доктора и кандидаты наук)."));
         universities.add(new University(29, "Российский государственный социальный университет", "Соц-Эконом", 200, "Российский государственный социальный университет (РГСУ) - это один из ведущих российских вузов, который готовит успешных и квалифицированных специалистов в самых разных сферах экономики, политики и общественной жизни страны. История вуза насчитывает больше века. Университет является идейным наследником Коммунистического университета имени Я.М.Свердлова (1919) и Высшей партийной школы при ЦК ВКП(б). Сегодня на 11 факультетах РГСУ получают образование более 19 тысяч студентов из 65 стран мира. Подготовка ведется по 187 основным образовательным программам бакалавриата, специалитета, магистратуры и аспирантуры. Со студентами работают высококвалифицированные преподаватели, 85% из них имеют ученую степень. В образовательном процессе широко используются инновационные подходы, цифровые технологии и инструменты удаленного доступа к образовательному контенту. Университет известен в стране качеством реализуемой воспитательной работы."));
         universities.add(new University(30, "Московский государственный медико-стоматологический университет", "Хим-Био", 140, "Занимает 4-е место в рейтинге 97 профильных вузов. В 2012 году на дневном отделении по направлению «Стоматология» было заявлено 230 бюджетных мест, что позволило поступить в вуз абитуриентам со средним баллом за один ЕГЭ 72,3 пункта. Соответствующие показатели специальности «Лечебное дело» – 210 мест и 71 балл. Кстати, по этому направлению активно ведется набор на условиях целевого приема: в 2012 году по этой системе студентами вуза стали 147 человек."));
@@ -241,48 +255,6 @@ public class MainActivity extends AppCompatActivity {
         UniversityAdapter universitiesAdapter = new UniversityAdapter(this, universities);
         binding.ListView.setAdapter(universitiesAdapter);
     }
-
-
-    public void sortUniversitiesByFaculty(List<University> universities, String faculty) {
-        if (faculty == null || faculty.isEmpty()) {
-            return;
-        }
-
-        for (University university : universities) {
-            if (university.getFaculty().equals(faculty)) {
-                sortedUniversities.add(university);
-            }
-        }
-
-    }
-
-
-    private void sortByFaculty(String faculty) {
-        sortUniversitiesByFaculty(universities, faculty);
-        UniversityAdapter universitiesAdapter = new UniversityAdapter(this, sortedUniversities);
-        binding.ListView.setAdapter(universitiesAdapter);
-    }
-
-    public void unSortUniversitiesByFaculty(List<University> universities, String faculty) {
-        if (faculty == null || faculty.isEmpty()) {
-            return;
-        }
-
-        for (University university : universities) {
-            if (university.getFaculty().equals(faculty)) {
-                sortedUniversities.remove(university);
-            }
-
-        }
-
-    }
-
-    private void unSortByFaculty(String faculty) {
-        unSortUniversitiesByFaculty(universities, faculty);
-        UniversityAdapter universitiesAdapter = new UniversityAdapter(this, sortedUniversities);
-        binding.ListView.setAdapter(universitiesAdapter);
-    }
-
 
     private void showDescriptionDialog(int position) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -297,6 +269,4 @@ public class MainActivity extends AppCompatActivity {
         AlertDialog dialog = builder.create();
         dialog.show();
     }
-    }
-
-
+}

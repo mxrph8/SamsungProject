@@ -1,6 +1,10 @@
 package dik.mysamsungproject;
 
+
+
 import androidx.annotation.NonNull;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
 
 public class University {
     private int id;
@@ -22,6 +26,7 @@ public class University {
         return description;
     }
 
+
     public int getId() {
         return id;
     }
@@ -38,8 +43,6 @@ public class University {
         return points;
     }
 
-    @NonNull
-    @Override
     public String toString() {
         return name + " (" + faculty + ", " + points + " баллы для поступления)";
     }
